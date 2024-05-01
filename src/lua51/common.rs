@@ -1,5 +1,6 @@
 pub mod instructions;
 pub mod constants;
+pub mod debug_info;
 
 use scroll::Pread;
 
@@ -27,5 +28,6 @@ pub struct Prototype {
     pub max_stack_size: u8,
     pub instructions: Vec<instructions::Instruction>,
     pub constants: Vec<constants::Constant>,
-    pub prototypes: Vec<Prototype>
+    pub prototypes: Vec<Prototype>,
+    pub debug_info: debug_info::DebugInfo,
 }
