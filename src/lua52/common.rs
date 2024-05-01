@@ -1,6 +1,7 @@
 pub mod instructions;
 pub mod constants;
 pub mod upvalues;
+pub mod debug_info;
 
 use scroll::Pread;
 
@@ -28,4 +29,5 @@ pub struct Prototype {
     pub instructions: Vec<instructions::Instruction>,
     pub constants: Vec<constants::Constant>,
     pub upvalues: Vec<upvalues::Upvalue>,
+    pub debug_info: debug_info::DebugInfo,
 }
