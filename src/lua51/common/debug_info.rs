@@ -14,5 +14,5 @@ pub struct LocalVariable {
     /// first point where variable is active
     pub start: i32,
     /// first point where variable is dead
-    pub end: u32
+    pub end: i32
 }
