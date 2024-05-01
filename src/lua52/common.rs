@@ -2,6 +2,7 @@ pub mod instructions;
 pub mod constants;
 pub mod upvalues;
 pub mod debug_info;
+pub mod string;
 
 use scroll::Pread;
 
@@ -30,4 +31,10 @@ pub struct Prototype {
     pub constants: Vec<constants::Constant>,
     pub upvalues: Vec<upvalues::Upvalue>,
     pub debug_info: debug_info::DebugInfo,
+}
+
+#[derive(Debug)]
+pub struct Bytecode {
+    pub header: Header,
+    pub prototype: Prototype,
 }

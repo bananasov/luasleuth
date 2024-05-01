@@ -26,10 +26,7 @@ impl<'a> Disassembler<'a> {
         let header: common::Header = self.buffer.gread_with(offset, LE)?;
         let prototype = self.disassemble_prototype(offset)?;
 
-        Ok(Bytecode {
-            header,
-            prototype,
-        })
+        Ok(Bytecode { header, prototype })
     }
 
     fn disassemble_prototype(&self, offset: &mut usize) -> Result<Prototype, scroll::Error> {
