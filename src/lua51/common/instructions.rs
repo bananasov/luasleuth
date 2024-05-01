@@ -65,3 +65,149 @@ pub enum Opcode {
 
     OP_VARARG = 37, /*	A B	R(A), R(A+1), ..., R(A+B-1) = vararg		*/
 }
+
+impl From<Opcode> for u8 {
+    fn from(val: Opcode) -> u8 {
+        match val {
+            Opcode::OP_MOVE => 0,
+            Opcode::OP_LOADK => 1,
+            Opcode::OP_LOADBOOL => 2,
+            Opcode::OP_LOADNIL => 3,
+            Opcode::OP_GETUPVAL => 4,
+            Opcode::OP_GETGLOBAL => 5,
+            Opcode::OP_GETTABLE => 6,
+            Opcode::OP_SETGLOBAL => 7,
+            Opcode::OP_SETUPVAL => 8,
+            Opcode::OP_SETTABLE => 9,
+            Opcode::OP_NEWTABLE => 10,
+            Opcode::OP_SELF => 11,
+            Opcode::OP_ADD => 12,
+            Opcode::OP_SUB => 13,
+            Opcode::OP_MUL => 14,
+            Opcode::OP_DIV => 15,
+            Opcode::OP_MOD => 16,
+            Opcode::OP_POW => 17,
+            Opcode::OP_UNM => 18,
+            Opcode::OP_NOT => 19,
+            Opcode::OP_LEN => 20,
+            Opcode::OP_CONCAT => 21,
+            Opcode::OP_JMP => 22,
+            Opcode::OP_EQ => 23,
+            Opcode::OP_LT => 24,
+            Opcode::OP_LE => 25,
+            Opcode::OP_TEST => 26,
+            Opcode::OP_TESTSET => 27,
+            Opcode::OP_CALL => 28,
+            Opcode::OP_TAILCALL => 29,
+            Opcode::OP_RETURN => 30,
+            Opcode::OP_FORLOOP => 31,
+            Opcode::OP_FORPREP => 32,
+            Opcode::OP_TFORLOOP => 33,
+            Opcode::OP_SETLIST => 34,
+            Opcode::OP_CLOSE => 35,
+            Opcode::OP_CLOSURE => 36,
+            Opcode::OP_VARARG => 37,
+        }
+    }
+}
+
+impl From<u8> for Opcode {
+    fn from(val: u8) -> Self {
+        match val {
+            0 => Opcode::OP_MOVE,
+            1 => Opcode::OP_LOADK,
+            2 => Opcode::OP_LOADBOOL,
+            3 => Opcode::OP_LOADNIL,
+            4 => Opcode::OP_GETUPVAL,
+            5 => Opcode::OP_GETGLOBAL,
+            6 => Opcode::OP_GETTABLE,
+            7 => Opcode::OP_SETGLOBAL,
+            8 => Opcode::OP_SETUPVAL,
+            9 => Opcode::OP_SETTABLE,
+            10 => Opcode::OP_NEWTABLE,
+            11 => Opcode::OP_SELF,
+            12 => Opcode::OP_ADD,
+            13 => Opcode::OP_SUB,
+            14 => Opcode::OP_MUL,
+            15 => Opcode::OP_DIV,
+            16 => Opcode::OP_MOD,
+            17 => Opcode::OP_POW,
+            18 => Opcode::OP_UNM,
+            19 => Opcode::OP_NOT,
+            20 => Opcode::OP_LEN,
+            21 => Opcode::OP_CONCAT,
+            22 => Opcode::OP_JMP,
+            23 => Opcode::OP_EQ,
+            24 => Opcode::OP_LT,
+            25 => Opcode::OP_LE,
+            26 => Opcode::OP_TEST,
+            27 => Opcode::OP_TESTSET,
+            28 => Opcode::OP_CALL,
+            29 => Opcode::OP_TAILCALL,
+            30 => Opcode::OP_RETURN,
+            31 => Opcode::OP_FORLOOP,
+            32 => Opcode::OP_FORPREP,
+            33 => Opcode::OP_TFORLOOP,
+            34 => Opcode::OP_SETLIST,
+            35 => Opcode::OP_CLOSE,
+            36 => Opcode::OP_CLOSURE,
+            37 => Opcode::OP_VARARG,
+            _ => unreachable!("Invalid instruction"),
+        }
+    }
+}
+
+impl Opcode {
+    pub fn decode(op: u32) -> Instruction {
+        use Opcode::*;
+
+        let instruction: Opcode = ((op & 0x3F) as u8).into();
+        let a = ((op >> 6) & 0xFF) as u8;
+
+        match instruction {
+            OP_MOVE | OP_LOADBOOL | OP_LOADNIL | OP_GETUPVAL | OP_GETTABLE | OP_SETUPVAL
+            | OP_SETTABLE | OP_NEWTABLE | OP_SELF | OP_ADD | OP_SUB | OP_MUL | OP_DIV | OP_MOD
+            | OP_POW | OP_UNM | OP_NOT | OP_LEN | OP_CONCAT | OP_EQ | OP_LT | OP_LE | OP_TEST
+            | OP_TESTSET | OP_CALL | OP_TAILCALL | OP_RETURN | OP_TFORLOOP | OP_SETLIST
+            | OP_CLOSE | OP_VARARG => {
+                let b = ((op >> 23) & 0x1FF) as u16;
+                let c = ((op >> 14) & 0x1FF) as u16;
+                Instruction::iABC(instruction, a, b, c)
+            }
+            OP_LOADK | OP_GETGLOBAL | OP_SETGLOBAL | OP_CLOSURE => {
+                let bx = (op >> 14) & 0x3FFFF;
+                Instruction::iABx(instruction, a, bx)
+            }
+            OP_JMP | OP_FORLOOP | OP_FORPREP => {
+                let sbx = (((op >> 14) & 0x3FFFF) as i32) - 137071;
+                Instruction::iAsBx(instruction, a, sbx)
+            }
+        }
+    }
+
+    pub fn encode(instruction: Instruction) -> u32 {
+        match instruction {
+            Instruction::iABC(op, a, b, c) => {
+                let op = op as u32;
+                let a = (a << 6) as u32;
+                let c = (c << 14) as u32;
+                let b = (b << 23) as u32;
+
+                return op | a | c | b;
+            }
+            Instruction::iABx(op, a, bx) => {
+                let op = op as u32;
+                let a = (a << 6) as u32;
+                let bx = (bx << 14) as u32;
+
+                return op | a | bx;
+            }
+            Instruction::iAsBx(op, a, sbx) => {
+                let op = op as u32;
+                let a = (a << 6) as u32;
+                let sbx = ((sbx + 131071) as u32) << 14;
+                return op | a | sbx;
+            }
+        }
+    }
+}
