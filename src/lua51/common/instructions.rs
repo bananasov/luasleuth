@@ -189,24 +189,24 @@ impl Opcode {
         match instruction {
             Instruction::iABC(op, a, b, c) => {
                 let op = op as u32;
-                let a = (a << 6) as u32;
-                let c = (c << 14) as u32;
-                let b = (b << 23) as u32;
+                let a = (a as u32) << 6;
+                let c = (c as u32) << 14;
+                let b = (b as u32) << 23;
 
-                return op | a | c | b;
+                op | a | c | b
             }
             Instruction::iABx(op, a, bx) => {
                 let op = op as u32;
                 let a = (a << 6) as u32;
-                let bx = (bx << 14) as u32;
+                let bx = bx << 14;
 
-                return op | a | bx;
+                op | a | bx
             }
             Instruction::iAsBx(op, a, sbx) => {
                 let op = op as u32;
                 let a = (a << 6) as u32;
                 let sbx = ((sbx + 131071) as u32) << 14;
-                return op | a | sbx;
+                op | a | sbx
             }
         }
     }

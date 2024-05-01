@@ -68,3 +68,166 @@ pub enum Opcode {
 
     OP_EXTRAARG = 39, /*	Ax	extra (larger) argument for previous opcode	*/
 }
+
+impl From<Opcode> for u8 {
+    fn from(value: Opcode) -> Self {
+        match value {
+            Opcode::OP_MOVE => 0,
+            Opcode::OP_LOADK => 1,
+            Opcode::OP_LOADKX => 2,
+            Opcode::OP_LOADBOOL => 3,
+            Opcode::OP_LOADNIL => 4,
+            Opcode::OP_GETUPVAL => 5,
+            Opcode::OP_GETTABUP => 6,
+            Opcode::OP_GETTABLE => 7,
+            Opcode::OP_SETTABUP => 8,
+            Opcode::OP_SETUPVAL => 9,
+            Opcode::OP_SETTABLE => 10,
+            Opcode::OP_NEWTABLE => 11,
+            Opcode::OP_SELF => 12,
+            Opcode::OP_ADD => 13,
+            Opcode::OP_SUB => 14,
+            Opcode::OP_MUL => 15,
+            Opcode::OP_DIV => 16,
+            Opcode::OP_MOD => 17,
+            Opcode::OP_POW => 18,
+            Opcode::OP_UNM => 19,
+            Opcode::OP_NOT => 20,
+            Opcode::OP_LEN => 21,
+            Opcode::OP_CONCAT => 22,
+            Opcode::OP_JMP => 23,
+            Opcode::OP_EQ => 24,
+            Opcode::OP_LT => 25,
+            Opcode::OP_LE => 26,
+            Opcode::OP_TEST => 27,
+            Opcode::OP_TESTSET => 28,
+            Opcode::OP_CALL => 29,
+            Opcode::OP_TAILCALL => 30,
+            Opcode::OP_RETURN => 31,
+            Opcode::OP_FORLOOP => 32,
+            Opcode::OP_FORPREP => 33,
+            Opcode::OP_TFORCALL => 34,
+            Opcode::OP_TFORLOOP => 35,
+            Opcode::OP_SETLIST => 36,
+            Opcode::OP_CLOSURE => 37,
+            Opcode::OP_VARARG => 38,
+            Opcode::OP_EXTRAARG => 39,
+        }
+    }
+}
+
+impl From<u8> for Opcode {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Opcode::OP_MOVE,
+            1 => Opcode::OP_LOADK,
+            2 => Opcode::OP_LOADKX,
+            3 => Opcode::OP_LOADBOOL,
+            4 => Opcode::OP_LOADNIL,
+            5 => Opcode::OP_GETUPVAL,
+            6 => Opcode::OP_GETTABUP,
+            7 => Opcode::OP_GETTABLE,
+            8 => Opcode::OP_SETTABUP,
+            9 => Opcode::OP_SETUPVAL,
+            10 => Opcode::OP_SETTABLE,
+            11 => Opcode::OP_NEWTABLE,
+            12 => Opcode::OP_SELF,
+            13 => Opcode::OP_ADD,
+            14 => Opcode::OP_SUB,
+            15 => Opcode::OP_MUL,
+            16 => Opcode::OP_DIV,
+            17 => Opcode::OP_MOD,
+            18 => Opcode::OP_POW,
+            19 => Opcode::OP_UNM,
+            20 => Opcode::OP_NOT,
+            21 => Opcode::OP_LEN,
+            22 => Opcode::OP_CONCAT,
+            23 => Opcode::OP_JMP,
+            24 => Opcode::OP_EQ,
+            25 => Opcode::OP_LT,
+            26 => Opcode::OP_LE,
+            27 => Opcode::OP_TEST,
+            28 => Opcode::OP_TESTSET,
+            29 => Opcode::OP_CALL,
+            30 => Opcode::OP_TAILCALL,
+            31 => Opcode::OP_RETURN,
+            32 => Opcode::OP_FORLOOP,
+            33 => Opcode::OP_FORPREP,
+            34 => Opcode::OP_TFORCALL,
+            35 => Opcode::OP_TFORLOOP,
+            36 => Opcode::OP_SETLIST,
+            37 => Opcode::OP_CLOSURE,
+            38 => Opcode::OP_VARARG,
+            39 => Opcode::OP_EXTRAARG,
+            _ => unreachable!("Invalid opcode"),
+        }
+    }
+}
+
+impl Opcode {
+    pub fn decode(op: u32) -> Instruction {
+        use Opcode::*;
+
+        let opcode: Opcode = ((op & 0x3F) as u8).into();
+        let a = ((op >> 6) & 0xFF) as u8;
+
+        match opcode {
+            OP_MOVE | OP_LOADBOOL | OP_LOADNIL | OP_GETUPVAL | OP_GETTABLE | OP_SETUPVAL
+            | OP_SETTABLE | OP_NEWTABLE | OP_SELF | OP_ADD | OP_SUB | OP_MUL | OP_DIV | OP_MOD
+            | OP_POW | OP_UNM | OP_NOT | OP_LEN | OP_CONCAT | OP_EQ | OP_LT | OP_LE | OP_TEST
+            | OP_TESTSET | OP_CALL | OP_TAILCALL | OP_RETURN | OP_SETLIST | OP_LOADKX
+            | OP_VARARG | OP_GETTABUP | OP_SETTABUP | OP_TFORCALL => {
+                let b = ((op >> 23) & 0x1FF) as u16;
+                let c = ((op >> 14) & 0x1FF) as u16;
+
+                Instruction::iABC(opcode, a, b, c)
+            }
+            OP_LOADK | OP_CLOSURE => {
+                let bx = (op >> 14) & 0x3FFFF;
+                Instruction::iABx(opcode, a, bx)
+            }
+            OP_JMP | OP_FORLOOP | OP_FORPREP | OP_TFORLOOP => {
+                let sbx = ((op >> 14) & 0x3FFFF) as i32 - 131071;
+
+                Instruction::iAsBx(opcode, a, sbx)
+            }
+            OP_EXTRAARG => {
+                let ax = op >> 6;
+
+                Instruction::iAx(opcode, ax)
+            }
+        }
+    }
+    pub fn encode(instruction: Instruction) -> u32 {
+        match instruction {
+            Instruction::iABC(op, a, b, c) => {
+                let op = op as u32;
+                let a = (a as u32) << 6;
+                let c = (c as u32) << 14;
+                let b = (b as u32) << 23;
+
+                op | a | c | b
+            }
+            Instruction::iABx(op, a, bx) => {
+                let op = op as u32;
+                let a = (a << 6) as u32;
+                let bx = bx << 14;
+
+                op | a | bx
+            }
+            Instruction::iAsBx(op, a, sbx) => {
+                let op = op as u32;
+                let a = (a << 6) as u32;
+                let sbx = ((sbx + 131071) as u32) << 14;
+
+                op | a | sbx
+            }
+            Instruction::iAx(op, ax) => {
+                let op = op as u32;
+                let ax = ax << 6;
+
+                op | ax
+            }
+        }
+    }
+}
