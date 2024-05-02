@@ -1,9 +1,9 @@
 //! Module for assembling and disassembling Lua 5.4 bytecode
-//! 
-//! 
+//!
+//!
 
-pub mod common;
 pub mod assembler;
+pub mod common;
 pub mod disassembler;
 
 use scroll::Pread;

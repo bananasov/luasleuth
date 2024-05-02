@@ -11,6 +11,7 @@ use super::common::{
     Bytecode, Prototype,
 };
 
+#[derive(Debug)]
 pub struct Disassembler<'a> {
     buffer: &'a [u8],
 }

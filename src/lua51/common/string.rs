@@ -1,11 +1,11 @@
-use scroll::{Pread, Endian};
 use crate::try_gread_vec_with;
+use scroll::{Endian, Pread};
 
 #[derive(Debug)]
 pub struct LuaString(Vec<u8>);
 
 impl<'a> LuaString {
-    #[cfg(target_arch="x86")]
+    #[cfg(target_arch = "x86")]
     pub fn read(
         src: &'a [u8],
         offset: &mut usize,
@@ -18,7 +18,7 @@ impl<'a> LuaString {
         Ok(LuaString(data))
     }
 
-    #[cfg(target_arch="x86_64")]
+    #[cfg(target_arch = "x86_64")]
     pub fn read(
         src: &'a [u8],
         offset: &mut usize,

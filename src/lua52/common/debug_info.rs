@@ -1,12 +1,13 @@
 #[derive(Debug)]
 pub struct DebugInfo {
-    pub source: Option<String>,
+    /// The prototype name
+    pub source: String,
     /// map from opcodes to source lines.
     pub line_info: Vec<i32>,
     /// information about local variables
     pub local_variables: Vec<LocalVariable>,
     /// upvalue information
-    pub upvalues: Vec<String>
+    pub upvalues: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -15,5 +16,5 @@ pub struct LocalVariable {
     /// first point where variable is active
     pub start: i32,
     /// first point where variable is dead
-    pub end: u32
+    pub end: i32,
 }

@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
 #[repr(u8)]
@@ -13,8 +12,8 @@ pub enum Opcode {
     OP_GETTABUP = 6, /*	A B C	R(A) := UpValue[B][RK(C)]			*/
     OP_GETTABLE = 7, /*	A B C	R(A) := R(B)[RK(C)]				*/
 
-    OP_SETTABUP = 8, /*	A B C	UpValue[A][RK(B)] := RK(C)			*/
-    OP_SETUPVAL = 9, /*	A B	UpValue[B] := R(A)				*/
+    OP_SETTABUP = 8,  /*	A B C	UpValue[A][RK(B)] := RK(C)			*/
+    OP_SETUPVAL = 9,  /*	A B	UpValue[B] := R(A)				*/
     OP_SETTABLE = 10, /*	A B C	R(A)[RK(B)] := RK(C)				*/
 
     OP_NEWTABLE = 11, /*	A B C	R(A) := {} (size = B,C)				*/
@@ -53,7 +52,7 @@ pub enum Opcode {
     OP_RETURN = 38,   /*	A B	return R(A), ... ,R(A+B-2)	(see note)	*/
 
     OP_FORLOOP = 39, /*	A sBx	R(A)+=R(A+2);
-                if R(A) <?= R(A+1) then { pc+=sBx; R(A+3)=R(A) }*/
+                     if R(A) <?= R(A+1) then { pc+=sBx; R(A+3)=R(A) }*/
     OP_FORPREP = 40, /*	A sBx	R(A)-=R(A+2); pc+=sBx				*/
 
     OP_TFORCALL = 41, /*	A C	R(A+3), ... ,R(A+2+C) := R(A)(R(A+1), R(A+2));	*/

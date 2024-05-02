@@ -5,7 +5,7 @@ pub struct DebugInfo {
     /// information about local variables
     pub local_variables: Vec<LocalVariable>,
     /// upvalue information
-    pub upvalues: Vec<String>
+    pub upvalues: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -14,5 +14,5 @@ pub struct LocalVariable {
     /// first point where variable is active
     pub start: i32,
     /// first point where variable is dead
-    pub end: i32
+    pub end: i32,
 }
