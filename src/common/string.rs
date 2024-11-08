@@ -17,6 +17,16 @@ impl<'b> LuaString<'b> {
     }
 }
 
+impl LuaStringCtx {
+    #[inline]
+    pub fn new_le(size_of_sizet: u8) -> Self {
+        Self {
+            endianess: scroll::LE,
+            size_of_sizet,
+        }
+    }
+}
+
 impl<'a> ctx::TryFromCtx<'a, LuaStringCtx> for LuaString<'a> {
     type Error = scroll::Error;
 

@@ -30,13 +30,7 @@ impl<'a> Constant {
                 Constant::LUA_TNUMBER(value)
             }
             4 => {
-                let str: LuaString = src.gread_with(
-                    offset,
-                    LuaStringCtx {
-                        endianess: endian,
-                        size_of_sizet,
-                    },
-                )?;
+                let str: LuaString = src.gread_with(offset, LuaStringCtx::new_le(size_of_sizet))?;
                 Constant::LUA_TSTRING(str.into_string())
             }
             _ => unreachable!("Somehow got an invalid constant type"),

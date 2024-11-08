@@ -112,13 +112,9 @@ impl<'a> Disassembler<'a> {
         size_of_sizet: u8,
         offset: &mut usize,
     ) -> Result<DebugInfo, scroll::Error> {
-        let source: LuaString = self.buffer.gread_with(
-            offset,
-            LuaStringCtx {
-                endianess: LE,
-                size_of_sizet,
-            },
-        )?;
+        let source: LuaString = self
+            .buffer
+            .gread_with(offset, LuaStringCtx::new_le(size_of_sizet))?;
 
         let amount: u32 = self.buffer.gread_with(offset, LE)?;
         let line_info: Vec<i32> = try_gread_vec_with!(self.buffer, offset, amount, LE);
@@ -154,13 +150,9 @@ impl<'a> Disassembler<'a> {
         size_of_sizet: u8,
         offset: &mut usize,
     ) -> Result<LocalVariable, scroll::Error> {
-        let name: LuaString = self.buffer.gread_with(
-            offset,
-            LuaStringCtx {
-                endianess: LE,
-                size_of_sizet,
-            },
-        )?;
+        let name: LuaString = self
+            .buffer
+            .gread_with(offset, LuaStringCtx::new_le(size_of_sizet))?;
         let start: i32 = self.buffer.gread_with(offset, LE)?;
         let end: i32 = self.buffer.gread_with(offset, LE)?;
 
@@ -198,13 +190,9 @@ impl<'a> Disassembler<'a> {
         let amount: u32 = self.buffer.gread_with(offset, LE)?;
         let mut upvalues: Vec<String> = Vec::new();
         for _ in 0..amount {
-            let local: LuaString = self.buffer.gread_with(
-                offset,
-                LuaStringCtx {
-                    endianess: LE,
-                    size_of_sizet,
-                },
-            )?;
+            let local: LuaString = self
+                .buffer
+                .gread_with(offset, LuaStringCtx::new_le(size_of_sizet))?;
             upvalues.push(local.into_string());
         }
 
