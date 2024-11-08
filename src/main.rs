@@ -1,9 +1,9 @@
 use std::io::Read;
 
-use luasleuth::lua52::disassembler::Disassembler;
+use luasleuth::lua51::disassembler::Disassembler;
 
 fn main() {
-    let mut file = std::fs::File::open("data/bytecode/lua52.bin").unwrap();
+    let mut file = std::fs::File::open("data/bytecode/lua51.bin").unwrap();
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer).unwrap();
 

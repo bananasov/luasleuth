@@ -13,5 +13,6 @@ pub mod luajit;
 #[macro_use]
 pub mod utils;
 
+pub mod common;
 mod errors;
 pub use errors::Error;
