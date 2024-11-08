@@ -1,6 +1,6 @@
 use scroll::{Endian, Pread};
 
-use super::string::LuaString;
+use crate::common::string::{LuaString, LuaStringCtx};
 
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
@@ -15,6 +15,7 @@ impl<'a> Constant {
     pub fn decode(
         src: &'a [u8],
         offset: &mut usize,
+        size_of_sizet: u8,
         endian: Endian,
     ) -> Result<Constant, scroll::Error> {
         let const_type: u8 = src.gread_with(offset, endian)?;
@@ -29,10 +30,16 @@ impl<'a> Constant {
                 Constant::LUA_TNUMBER(value)
             }
             4 => {
-                let str = LuaString::read(src, offset, endian)?;
-                Constant::LUA_TSTRING(str.into())
+                let str: LuaString = src.gread_with(
+                    offset,
+                    LuaStringCtx {
+                        endianess: endian,
+                        size_of_sizet,
+                    },
+                )?;
+                Constant::LUA_TSTRING(str.into_string())
             }
-            _ => unreachable!("Somehow got an invalid constant type: {}", const_type),
+            _ => unreachable!("Somehow got an invalid constant type"),
         };
 
         Ok(constant)

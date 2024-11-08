@@ -1,7 +1,6 @@
 pub mod constants;
 pub mod debug_info;
 pub mod instructions;
-pub mod string;
 pub mod upvalues;
 
 use scroll::Pread;
