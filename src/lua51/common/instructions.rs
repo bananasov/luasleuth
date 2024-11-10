@@ -1,3 +1,5 @@
+use scroll::{ctx, Pread, Pwrite};
+
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
 pub enum Instruction {
@@ -67,47 +69,8 @@ pub enum Opcode {
 }
 
 impl From<Opcode> for u8 {
-    fn from(val: Opcode) -> u8 {
-        match val {
-            Opcode::OP_MOVE => 0,
-            Opcode::OP_LOADK => 1,
-            Opcode::OP_LOADBOOL => 2,
-            Opcode::OP_LOADNIL => 3,
-            Opcode::OP_GETUPVAL => 4,
-            Opcode::OP_GETGLOBAL => 5,
-            Opcode::OP_GETTABLE => 6,
-            Opcode::OP_SETGLOBAL => 7,
-            Opcode::OP_SETUPVAL => 8,
-            Opcode::OP_SETTABLE => 9,
-            Opcode::OP_NEWTABLE => 10,
-            Opcode::OP_SELF => 11,
-            Opcode::OP_ADD => 12,
-            Opcode::OP_SUB => 13,
-            Opcode::OP_MUL => 14,
-            Opcode::OP_DIV => 15,
-            Opcode::OP_MOD => 16,
-            Opcode::OP_POW => 17,
-            Opcode::OP_UNM => 18,
-            Opcode::OP_NOT => 19,
-            Opcode::OP_LEN => 20,
-            Opcode::OP_CONCAT => 21,
-            Opcode::OP_JMP => 22,
-            Opcode::OP_EQ => 23,
-            Opcode::OP_LT => 24,
-            Opcode::OP_LE => 25,
-            Opcode::OP_TEST => 26,
-            Opcode::OP_TESTSET => 27,
-            Opcode::OP_CALL => 28,
-            Opcode::OP_TAILCALL => 29,
-            Opcode::OP_RETURN => 30,
-            Opcode::OP_FORLOOP => 31,
-            Opcode::OP_FORPREP => 32,
-            Opcode::OP_TFORLOOP => 33,
-            Opcode::OP_SETLIST => 34,
-            Opcode::OP_CLOSE => 35,
-            Opcode::OP_CLOSURE => 36,
-            Opcode::OP_VARARG => 37,
-        }
+    fn from(op: Opcode) -> u8 {
+        op as u8
     }
 }
 
@@ -161,10 +124,10 @@ impl Opcode {
     pub fn decode(op: u32) -> Instruction {
         use Opcode::*;
 
-        let instruction: Opcode = ((op & 0x3F) as u8).into();
+        let opcode: Opcode = ((op & 0x3F) as u8).into();
         let a = ((op >> 6) & 0xFF) as u8;
 
-        match instruction {
+        match opcode {
             OP_MOVE | OP_LOADBOOL | OP_LOADNIL | OP_GETUPVAL | OP_GETTABLE | OP_SETUPVAL
             | OP_SETTABLE | OP_NEWTABLE | OP_SELF | OP_ADD | OP_SUB | OP_MUL | OP_DIV | OP_MOD
             | OP_POW | OP_UNM | OP_NOT | OP_LEN | OP_CONCAT | OP_EQ | OP_LT | OP_LE | OP_TEST
@@ -172,15 +135,15 @@ impl Opcode {
             | OP_CLOSE | OP_VARARG => {
                 let b = ((op >> 23) & 0x1FF) as u16;
                 let c = ((op >> 14) & 0x1FF) as u16;
-                Instruction::iABC(instruction, a, b, c)
+                Instruction::iABC(opcode, a, b, c)
             }
             OP_LOADK | OP_GETGLOBAL | OP_SETGLOBAL | OP_CLOSURE => {
                 let bx = (op >> 14) & 0x3FFFF;
-                Instruction::iABx(instruction, a, bx)
+                Instruction::iABx(opcode, a, bx)
             }
             OP_JMP | OP_FORLOOP | OP_FORPREP => {
                 let sbx = (((op >> 14) & 0x3FFFF) as i32) - 137071;
-                Instruction::iAsBx(instruction, a, sbx)
+                Instruction::iAsBx(opcode, a, sbx)
             }
         }
     }
@@ -209,5 +172,30 @@ impl Opcode {
                 op | a | sbx
             }
         }
+    }
+}
+
+impl<'a> ctx::TryFromCtx<'a, scroll::Endian> for Instruction {
+    type Error = scroll::Error;
+
+    fn try_from_ctx(from: &'a [u8], ctx: scroll::Endian) -> Result<(Self, usize), Self::Error> {
+        let offset = &mut 0;
+        let instruction: u32 = from.gread_with(offset, ctx)?;
+        let instruction = Opcode::decode(instruction);
+
+        Ok((instruction, *offset))
+    }
+}
+
+impl<'a> ctx::TryIntoCtx<scroll::Endian> for Instruction {
+    type Error = scroll::Error;
+
+    fn try_into_ctx(self, src: &mut [u8], ctx: scroll::Endian) -> Result<usize, Self::Error> {
+        let offset = &mut 0;
+
+        let n = Opcode::encode(self);
+        src.gwrite_with(n, offset, ctx)?;
+
+        Ok(*offset)
     }
 }

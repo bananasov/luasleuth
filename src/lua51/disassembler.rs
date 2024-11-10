@@ -6,10 +6,11 @@ use super::common::{
     self,
     constants::Constant,
     debug_info::{DebugInfo, LocalVariable},
-    instructions::{Instruction, Opcode},
+    instructions::Instruction,
     Bytecode, Prototype,
 };
 use crate::common::string::{LuaString, LuaStringCtx};
+use crate::common::Array;
 
 #[derive(Debug)]
 pub struct Disassembler<'a> {
@@ -25,19 +26,19 @@ impl<'a> Disassembler<'a> {
         let offset = &mut 0;
 
         let header: common::Header = self.buffer.gread_with(offset, LE)?;
-        let prototype = self.disassemble_prototype(header.size_of_sizet, offset)?;
+        let prototype = self.disassemble_prototype(header.size_of_size_t, offset)?;
 
         Ok(Bytecode { header, prototype })
     }
 
     fn disassemble_prototype(
         &self,
-        size_of_sizet: u8,
+        size_of_size_t: u8,
         offset: &mut usize,
     ) -> Result<Prototype, scroll::Error> {
         let name: LuaString = self
             .buffer
-            .gread_with(offset, LuaStringCtx::new_le(size_of_sizet))?;
+            .gread_with(offset, LuaStringCtx::new_le(size_of_size_t))?;
         let line_defined: u32 = self.buffer.gread_with(offset, LE)?;
         let last_line_defined: u32 = self.buffer.gread_with(offset, LE)?;
         let number_of_upvalues: u8 = self.buffer.gread_with(offset, LE)?;
@@ -46,10 +47,10 @@ impl<'a> Disassembler<'a> {
         let max_stack_size: u8 = self.buffer.gread_with(offset, LE)?;
 
         let instructions = self.disassemble_instructions(offset)?;
-        let constants = self.disassemble_constants(size_of_sizet, offset)?;
-        let prototypes = self.disassemble_prototypes(size_of_sizet, offset)?;
+        let constants = self.disassemble_constants(size_of_size_t, offset)?;
+        let prototypes = self.disassemble_prototypes(size_of_size_t, offset)?;
 
-        let debug_info = self.disassemble_debug_info(size_of_sizet, offset)?;
+        let debug_info = self.disassemble_debug_info(size_of_size_t, offset)?;
 
         Ok(Prototype {
             name: name.into_string(),
@@ -69,57 +70,48 @@ impl<'a> Disassembler<'a> {
     fn disassemble_instructions(
         &self,
         offset: &mut usize,
-    ) -> Result<Vec<Instruction>, scroll::Error> {
-        let amount: u32 = self.buffer.gread_with(offset, LE)?;
-        let instruction_list: Vec<u32> = try_gread_vec_with!(self.buffer, offset, amount, LE);
-        let instructions: Vec<Instruction> = instruction_list
-            .iter()
-            .map(|f| Opcode::decode(*f))
-            .collect();
+    ) -> Result<Array<Instruction>, scroll::Error> {
+        let instructions: Array<Instruction> = self.buffer.gread_with(offset, LE)?;
 
         Ok(instructions)
     }
 
     fn disassemble_constants(
         &self,
-        size_of_sizet: u8,
+        size_of_size_t: u8,
         offset: &mut usize,
-    ) -> Result<Vec<Constant>, scroll::Error> {
-        let constant_amount: u32 = self.buffer.gread_with(offset, LE)?;
-        let mut constants: Vec<Constant> = Vec::new();
-        for _ in 0..constant_amount {
-            let constant = Constant::decode(self.buffer, offset, size_of_sizet, LE)?;
-            constants.push(constant);
-        }
+    ) -> Result<Array<Constant>, scroll::Error> {
+        let ctx = LuaStringCtx::new_le(size_of_size_t);
+        let constants: Array<Constant> = self.buffer.gread_with(offset, ctx)?;
 
         Ok(constants)
     }
 
     fn disassemble_prototypes(
         &self,
-        size_of_sizet: u8,
+        size_of_size_t: u8,
         offset: &mut usize,
-    ) -> Result<Vec<Prototype>, scroll::Error> {
+    ) -> Result<Array<Prototype>, scroll::Error> {
         let prototype_amount: u32 = self.buffer.gread_with(offset, LE)?;
         let mut prototypes: Vec<Prototype> = Vec::new();
         for _ in 0..prototype_amount {
-            let prototype = self.disassemble_prototype(size_of_sizet, offset)?;
+            let prototype = self.disassemble_prototype(size_of_size_t, offset)?;
             prototypes.push(prototype);
         }
 
-        Ok(prototypes)
+        Ok(prototypes.into())
     }
 
     fn disassemble_debug_info(
         &self,
-        size_of_sizet: u8,
+        size_of_size_t: u8,
         offset: &mut usize,
     ) -> Result<DebugInfo, scroll::Error> {
         let amount: u32 = self.buffer.gread_with(offset, LE)?;
         let line_info: Vec<i32> = try_gread_vec_with!(self.buffer, offset, amount, LE);
 
-        let local_variables = self.disassemble_local_variables(size_of_sizet, offset)?;
-        let upvalues = self.disassemble_upvalues(size_of_sizet, offset)?;
+        let local_variables = self.disassemble_local_variables(size_of_size_t, offset)?;
+        let upvalues = self.disassemble_upvalues(size_of_size_t, offset)?;
 
         Ok(DebugInfo {
             line_info,
@@ -130,13 +122,13 @@ impl<'a> Disassembler<'a> {
 
     fn disassemble_local_variables(
         &self,
-        size_of_sizet: u8,
+        size_of_size_t: u8,
         offset: &mut usize,
     ) -> Result<Vec<LocalVariable>, scroll::Error> {
         let amount: u32 = self.buffer.gread_with(offset, LE)?;
         let mut variables: Vec<LocalVariable> = Vec::new();
         for _ in 0..amount {
-            let local = self.disassemble_local_variable(size_of_sizet, offset)?;
+            let local = self.disassemble_local_variable(size_of_size_t, offset)?;
             variables.push(local);
         }
 
@@ -145,12 +137,12 @@ impl<'a> Disassembler<'a> {
 
     fn disassemble_local_variable(
         &self,
-        size_of_sizet: u8,
+        size_of_size_t: u8,
         offset: &mut usize,
     ) -> Result<LocalVariable, scroll::Error> {
         let name: LuaString = self
             .buffer
-            .gread_with(offset, LuaStringCtx::new_le(size_of_sizet))?;
+            .gread_with(offset, LuaStringCtx::new_le(size_of_size_t))?;
         let start: i32 = self.buffer.gread_with(offset, LE)?;
         let end: i32 = self.buffer.gread_with(offset, LE)?;
 
@@ -163,7 +155,7 @@ impl<'a> Disassembler<'a> {
 
     fn disassemble_upvalues(
         &self,
-        size_of_sizet: u8,
+        size_ofsize_of_size_tsizet: u8,
         offset: &mut usize,
     ) -> Result<Vec<String>, scroll::Error> {
         let amount: u32 = self.buffer.gread_with(offset, LE)?;
@@ -171,7 +163,7 @@ impl<'a> Disassembler<'a> {
         for _ in 0..amount {
             let local: LuaString = self
                 .buffer
-                .gread_with(offset, LuaStringCtx::new_le(size_of_sizet))?;
+                .gread_with(offset, LuaStringCtx::new_le(size_ofsize_of_size_tsizet))?;
             upvalues.push(local.into_string());
         }
 

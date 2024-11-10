@@ -1,11 +1,12 @@
 use scroll::{ctx, Pread, Pwrite};
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct LuaStringCtx {
     pub endianess: scroll::Endian,
     pub size_of_sizet: u8,
 }
 
+#[derive(Debug)]
 pub struct LuaString<'b> {
     length: usize,
     data: &'b str,
