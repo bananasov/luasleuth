@@ -1,8 +1,18 @@
-[package]
-name = "luasleuth"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = [ "crates/luasleuth",
+    "crates/luasleuth-common",
+    "crates/luasleuth-lua51",
+    "crates/luasleuth-lua52",
+    "crates/luasleuth-lua53",
+    "crates/luasleuth-lua54",
+    "crates/luasleuth-luajit",
+]
 
-[dependencies]
+[workspace.dependencies]
 scroll = { version = "0.12.0", features = ["derive"] }
-thiserror = "1.0.64"
+luasleuth-common = { path = "./crates/luasleuth-common" }
+luasleuth-lua51 = { path = "./crates/luasleuth-lua51" }
+luasleuth-lua52 = { path = "./crates/luasleuth-lua52" }
+luasleuth-lua53 = { path = "./crates/luasleuth-lua53" }
+luasleuth-lua54 = { path = "./crates/luasleuth-lua54" }

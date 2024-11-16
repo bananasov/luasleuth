@@ -1,0 +1,8 @@
+[package]
+name = "luasleuth-lua52"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+scroll.workspace = true
+luasleuth-common.workspace = true
