@@ -115,6 +115,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "luasleuth-common",
+ "luasleuth-lua51",
  "luasleuth-lua52",
  "luasleuth-lua53",
 ]
