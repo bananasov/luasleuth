@@ -49,21 +49,21 @@ pub struct Bytecode<'a> {
 impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {
     type Error = scroll::Error;
 
-    fn try_from_ctx(from: &'a [u8], ctx: CommonCtx) -> Result<(Self, usize), Self::Error> {
+    fn try_from_ctx(src: &'a [u8], ctx: CommonCtx) -> Result<(Self, usize), Self::Error> {
         let offset = &mut 0;
 
-        let source: LuaString = from.gread_with(offset, ctx)?;
-        let line_defined: u32 = from.gread_with(offset, ctx.endianness)?;
-        let last_line_defined: u32 = from.gread_with(offset, ctx.endianness)?;
-        let number_of_parameters: u8 = from.gread_with(offset, ctx.endianness)?;
-        let is_vararg: u8 = from.gread_with(offset, ctx.endianness)?;
-        let max_stack_size: u8 = from.gread_with(offset, ctx.endianness)?;
+        let source: LuaString = src.gread_with(offset, ctx)?;
+        let line_defined: u32 = src.gread_with(offset, ctx.endianness)?;
+        let last_line_defined: u32 = src.gread_with(offset, ctx.endianness)?;
+        let number_of_parameters: u8 = src.gread_with(offset, ctx.endianness)?;
+        let is_vararg: u8 = src.gread_with(offset, ctx.endianness)?;
+        let max_stack_size: u8 = src.gread_with(offset, ctx.endianness)?;
 
-        let instructions: Array<instructions::Instruction> = from.gread_with(offset, ctx)?;
-        let constants: Array<constants::Constant> = from.gread_with(offset, ctx)?;
-        let upvalues: Array<upvalues::Upvalue> = from.gread_with(offset, ctx)?;
-        let prototypes: Array<Prototype> = from.gread_with(offset, ctx)?;
-        let debug_info: debug_info::DebugInfo = from.gread_with(offset, ctx)?;
+        let instructions: Array<instructions::Instruction> = src.gread_with(offset, ctx)?;
+        let constants: Array<constants::Constant> = src.gread_with(offset, ctx)?;
+        let upvalues: Array<upvalues::Upvalue> = src.gread_with(offset, ctx)?;
+        let prototypes: Array<Prototype> = src.gread_with(offset, ctx)?;
+        let debug_info: debug_info::DebugInfo = src.gread_with(offset, ctx)?;
 
         Ok((
             Prototype {

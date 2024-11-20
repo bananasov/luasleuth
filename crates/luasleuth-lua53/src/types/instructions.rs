@@ -222,9 +222,9 @@ impl Instruction {
 impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Instruction {
     type Error = scroll::Error;
 
-    fn try_from_ctx(from: &'a [u8], ctx: CommonCtx) -> Result<(Self, usize), Self::Error> {
+    fn try_from_ctx(src: &'a [u8], ctx: CommonCtx) -> Result<(Self, usize), Self::Error> {
         let offset = &mut 0;
-        let instruction: u32 = from.gread_with(offset, ctx.endianness)?;
+        let instruction: u32 = src.gread_with(offset, ctx.endianness)?;
         let instruction = Instruction::decode(instruction);
 
         Ok((instruction, *offset))
