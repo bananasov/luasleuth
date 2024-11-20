@@ -59,9 +59,9 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {
         let is_vararg: u8 = from.gread_with(offset, ctx.endianness)?;
         let max_stack_size: u8 = from.gread_with(offset, ctx.endianness)?;
 
-        let instructions: Array<instructions::Instruction> = from.gread_with(offset, ctx.endianness)?;
+        let instructions: Array<instructions::Instruction> = from.gread_with(offset, ctx)?;
         let constants: Array<constants::Constant> = from.gread_with(offset, ctx)?;
-        let upvalues: Array<upvalues::Upvalue> = from.gread_with(offset, ctx.endianness)?;
+        let upvalues: Array<upvalues::Upvalue> = from.gread_with(offset, ctx)?;
         let prototypes: Array<Prototype> = from.gread_with(offset, ctx)?;
         let debug_info: debug_info::DebugInfo = from.gread_with(offset, ctx)?;
 

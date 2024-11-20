@@ -1,4 +1,4 @@
-use luasleuth_common::mask;
+use luasleuth_common::{mask, CommonCtx};
 use scroll::{ctx, Pread, Pwrite};
 
 pub mod constants {
@@ -219,26 +219,26 @@ impl Instruction {
     }
 }
 
-impl<'a> ctx::TryFromCtx<'a, scroll::Endian> for Instruction {
+impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Instruction {
     type Error = scroll::Error;
 
-    fn try_from_ctx(from: &'a [u8], ctx: scroll::Endian) -> Result<(Self, usize), Self::Error> {
+    fn try_from_ctx(from: &'a [u8], ctx: CommonCtx) -> Result<(Self, usize), Self::Error> {
         let offset = &mut 0;
-        let instruction: u32 = from.gread_with(offset, ctx)?;
+        let instruction: u32 = from.gread_with(offset, ctx.endianness)?;
         let instruction = Instruction::decode(instruction);
 
         Ok((instruction, *offset))
     }
 }
 
-impl<'a> ctx::TryIntoCtx<scroll::Endian> for Instruction {
+impl<'a> ctx::TryIntoCtx<CommonCtx> for Instruction {
     type Error = scroll::Error;
 
-    fn try_into_ctx(self, src: &mut [u8], ctx: scroll::Endian) -> Result<usize, Self::Error> {
+    fn try_into_ctx(self, src: &mut [u8], ctx: CommonCtx) -> Result<usize, Self::Error> {
         let offset = &mut 0;
 
         let n = Instruction::encode(self);
-        src.gwrite_with(n, offset, ctx)?;
+        src.gwrite_with(n, offset, ctx.endianness)?;
 
         Ok(*offset)
     }

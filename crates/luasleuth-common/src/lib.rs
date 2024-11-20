@@ -23,6 +23,8 @@ pub struct CommonCtx {
     /// The version of the Lua compiler.
     ///
     /// Because string reading differs between versions, this is required to decide how to read strings.
+    ///
+    /// Note that this assumes the format is official.
     pub lua_version: Version,
 
     /// The endianness of the file.

@@ -29,7 +29,7 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for DebugInfo<'a> {
     fn try_from_ctx(src: &'a [u8], ctx: CommonCtx) -> Result<(Self, usize), Self::Error> {
         let offset = &mut 0;
 
-        let line_info: Array<i32> = src.gread_with(offset, ctx.endianness)?;
+        let line_info: Array<i32> = src.gread_with(offset, ctx)?;
         let local_variables: Array<LocalVariable> = src.gread_with(offset, ctx)?;
         let upvalues: Array<LuaString> = src.gread_with(offset, ctx)?;
 
@@ -50,7 +50,7 @@ impl ctx::TryIntoCtx<CommonCtx> for DebugInfo<'_> {
     fn try_into_ctx(self, dst: &mut [u8], ctx: CommonCtx) -> Result<usize, Self::Error> {
         let offset = &mut 0;
 
-        dst.gwrite_with(self.line_info, offset, ctx.endianness)?;
+        dst.gwrite_with(self.line_info, offset, ctx)?;
         dst.gwrite_with(self.local_variables, offset, ctx)?;
         dst.gwrite_with(self.upvalues, offset, ctx)?;
 

@@ -55,7 +55,7 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {
         let code: Array<instructions::Instruction> = src.gread_with(offset, ctx)?;
         let constants: Array<constants::Constant> = src.gread_with(offset, ctx)?;
         let prototypes: Array<Prototype> = src.gread_with(offset, ctx)?;
-        let upvalues: Array<upvalues::Upvalue> = src.gread_with(offset, ctx.endianness)?;
+        let upvalues: Array<upvalues::Upvalue> = src.gread_with(offset, ctx)?;
         let debug_info: debug_info::DebugInfo = src.gread_with(offset, ctx)?;
 
         Ok((

@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
-members = [ "crates/luasleuth",
+members = [ 
+    "crates/luasleuth",
     "crates/luasleuth-common",
     "crates/luasleuth-lua51",
     "crates/luasleuth-lua52",
