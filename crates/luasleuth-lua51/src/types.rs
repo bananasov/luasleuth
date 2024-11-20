@@ -3,7 +3,7 @@ pub mod debug_info;
 pub mod instructions;
 
 use luasleuth_common::types::{Array, LuaString};
-use luasleuth_common::{Version, CommonCtx};
+use luasleuth_common::{CommonCtx, Version};
 use scroll::{ctx, Pread};
 
 #[derive(Debug, Pread)]

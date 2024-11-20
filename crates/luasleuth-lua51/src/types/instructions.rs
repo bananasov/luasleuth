@@ -1,4 +1,4 @@
-use luasleuth_common::{CommonCtx, mask};
+use luasleuth_common::{mask, CommonCtx};
 use scroll::{ctx, Pread, Pwrite};
 
 pub mod constants {

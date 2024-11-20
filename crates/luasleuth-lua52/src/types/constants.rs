@@ -1,4 +1,4 @@
-use luasleuth_common::{CommonCtx, types::LuaString};
+use luasleuth_common::{types::LuaString, CommonCtx};
 use scroll::{ctx, Pread, Pwrite};
 
 #[derive(Debug)]
@@ -40,10 +40,15 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Constant<'a> {
             1 => {
                 let value: u8 = src.gread_with(offset, ctx.endianness)?;
                 Constant::Boolean(value != 0)
-            },
+            }
             3 => Constant::Number(src.gread_with(offset, ctx.endianness)?),
             4 => Constant::String(src.gread_with(offset, ctx)?),
-            _ => return Err(scroll::Error::BadInput { size: 1, msg: "Invalid constant type" }),
+            _ => {
+                return Err(scroll::Error::BadInput {
+                    size: 1,
+                    msg: "Invalid constant type",
+                })
+            }
         };
 
         Ok((constant, *offset))
@@ -60,10 +65,16 @@ impl ctx::TryIntoCtx<CommonCtx> for Constant<'_> {
         dst.gwrite_with(constant, offset, ctx.endianness)?;
 
         match self {
-            Constant::Nil => {},
-            Constant::Boolean(value) => { dst.gwrite_with(value as u8, offset, ctx.endianness)?; },
-            Constant::Number(value) => { dst.gwrite_with(value, offset, ctx.endianness)?; },
-            Constant::String(value) => { dst.gwrite_with(value, offset, ctx)?; },
+            Constant::Nil => {}
+            Constant::Boolean(value) => {
+                dst.gwrite_with(value as u8, offset, ctx.endianness)?;
+            }
+            Constant::Number(value) => {
+                dst.gwrite_with(value, offset, ctx.endianness)?;
+            }
+            Constant::String(value) => {
+                dst.gwrite_with(value, offset, ctx)?;
+            }
         };
 
         Ok(*offset)

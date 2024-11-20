@@ -1,5 +1,8 @@
+use luasleuth_common::{
+    types::{Array, LuaString},
+    CommonCtx,
+};
 use scroll::{ctx, Pread, Pwrite};
-use luasleuth_common::{types::{Array, LuaString}, CommonCtx};
 
 #[derive(Debug)]
 pub struct DebugInfo<'a> {
@@ -29,7 +32,15 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for DebugInfo<'a> {
         let local_variables: Array<LocalVariable> = src.gread_with(offset, ctx)?;
         let upvalues: Array<LuaString> = src.gread_with(offset, ctx)?;
 
-        Ok((DebugInfo { source, line_info, local_variables, upvalues }, *offset))
+        Ok((
+            DebugInfo {
+                source,
+                line_info,
+                local_variables,
+                upvalues,
+            },
+            *offset,
+        ))
     }
 }
 
@@ -58,7 +69,14 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for LocalVariable<'a> {
         let start_pc: i32 = src.gread_with(offset, ctx.endianness)?;
         let end_pc: i32 = src.gread_with(offset, ctx.endianness)?;
 
-        Ok((LocalVariable { name, start_pc, end_pc }, *offset))
+        Ok((
+            LocalVariable {
+                name,
+                start_pc,
+                end_pc,
+            },
+            *offset,
+        ))
     }
 }
 

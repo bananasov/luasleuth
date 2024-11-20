@@ -43,7 +43,7 @@ pub struct Prototype<'a> {
 pub struct Bytecode<'a> {
     pub header: Header,
     pub size_of_upvalues: u8,
-    pub prototype: Prototype<'a>
+    pub prototype: Prototype<'a>,
 }
 
 impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {

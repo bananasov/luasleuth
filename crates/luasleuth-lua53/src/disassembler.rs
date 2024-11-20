@@ -1,9 +1,9 @@
+use crate::types::{Bytecode, Header, Prototype};
 use luasleuth_common::{disassembler::Disassemble, CommonCtx};
 use scroll::Pread;
-use crate::types::{Bytecode, Header, Prototype};
 
 pub struct Disassembler<'a> {
-    bytes: &'a [u8]
+    bytes: &'a [u8],
 }
 
 impl<'a> Disassembler<'a> {
@@ -27,6 +27,10 @@ impl<'a> Disassemble<Bytecode<'a>> for Disassembler<'a> {
         };
         let prototype: Prototype = self.bytes.gread_with(offset, ctx)?;
 
-        Ok(Bytecode { header, size_of_upvalues, prototype })
+        Ok(Bytecode {
+            header,
+            size_of_upvalues,
+            prototype,
+        })
     }
 }

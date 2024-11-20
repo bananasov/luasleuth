@@ -1,5 +1,5 @@
-use scroll::{ctx, Pread, Pwrite};
 use luasleuth_common::CommonCtx;
+use scroll::{ctx, Pread, Pwrite};
 
 #[derive(Debug, Pwrite)]
 pub struct Upvalue {

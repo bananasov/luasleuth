@@ -1,5 +1,5 @@
-mod string;
 mod array;
+mod string;
 
-pub use string::LuaString;
 pub use array::Array;
+pub use string::LuaString;

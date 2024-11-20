@@ -12,7 +12,7 @@ use luasleuth_lua53::disassembler::Disassembler as Lua53Disassembler;
 #[derive(Debug, Parser)]
 struct Cli {
     #[clap(subcommand)]
-    subcommand: Subcommand
+    subcommand: Subcommand,
 }
 
 #[derive(Debug, Parser)]
@@ -22,8 +22,8 @@ enum Subcommand {
         path: PathBuf,
 
         #[clap(short, long)]
-        version: types::LuaVersion
-    }
+        version: types::LuaVersion,
+    },
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 let bytecode = Lua51Disassembler::new(&buffer).disassemble()?;
                 println!("{:#?}", bytecode);
-            },
+            }
             types::LuaVersion::Lua52 => {
                 let mut file = File::open(path)?;
                 let mut buffer = Vec::new();
@@ -46,7 +46,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 let bytecode = Lua52Disassembler::new(&buffer).disassemble()?;
                 println!("{:#?}", bytecode);
-            },
+            }
             types::LuaVersion::Lua53 => {
                 let mut file = File::open(path)?;
                 let mut buffer = Vec::new();
@@ -54,9 +54,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 let bytecode = Lua53Disassembler::new(&buffer).disassemble()?;
                 println!("{:#?}", bytecode);
-            },
+            }
             _ => todo!(),
-        }
+        },
     };
 
     Ok(())

@@ -91,15 +91,15 @@ impl<'a> LuaString<'a> {
         todo!()
     }
 
-        /// Write a Lua 5.4 string.
-        pub fn write_lua54_string(
-            self,
-            _dst: &mut [u8],
-            _offset: &mut usize,
-            _ctx: CommonCtx,
-        ) -> Result<usize, scroll::Error> {
-            todo!()
-        }
+    /// Write a Lua 5.4 string.
+    pub fn write_lua54_string(
+        self,
+        _dst: &mut [u8],
+        _offset: &mut usize,
+        _ctx: CommonCtx,
+    ) -> Result<usize, scroll::Error> {
+        todo!()
+    }
 }
 
 impl<'a> ctx::TryFromCtx<'a, CommonCtx> for LuaString<'a> {

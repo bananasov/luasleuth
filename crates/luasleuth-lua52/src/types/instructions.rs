@@ -134,8 +134,8 @@ impl From<u8> for Opcode {
 
 impl Instruction {
     pub fn decode(inst: u32) -> Instruction {
-        use Opcode::*;
         use constants::*;
+        use Opcode::*;
 
         let opcode: Opcode = ((inst & 0x3F) as u8).into();
         let a = ((inst >> 6) & 0xFF) as u8;

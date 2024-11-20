@@ -1,4 +1,4 @@
-use luasleuth_common::{CommonCtx, types::LuaString};
+use luasleuth_common::{types::LuaString, CommonCtx};
 use scroll::{ctx, Pread};
 
 #[derive(Debug)]
@@ -26,7 +26,12 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Constant<'a> {
             3 => Constant::Float(src.gread_with(offset, ctx.endianness)?),
             19 => Constant::Integer(src.gread_with(offset, ctx.endianness)?),
             4 | 20 => Constant::String(src.gread_with(offset, ctx)?),
-            _ => return Err(scroll::Error::BadInput { size: 1, msg: "Invalid constant type" }),
+            _ => {
+                return Err(scroll::Error::BadInput {
+                    size: 1,
+                    msg: "Invalid constant type",
+                })
+            }
         };
 
         Ok((constant, *offset))

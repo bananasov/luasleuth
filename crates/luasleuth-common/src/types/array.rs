@@ -1,5 +1,5 @@
-use scroll::{ctx, Pread, Pwrite, Uleb128};
 use crate::{try_gread_vec_with, try_gwrite_vec_with, CommonCtx};
+use scroll::{ctx, Pread, Pwrite, Uleb128};
 
 #[derive(Debug)]
 pub struct Array<T> {
@@ -8,25 +8,34 @@ pub struct Array<T> {
 }
 
 impl<T> Array<T> {
-    pub fn read_size(src: &[u8], offset: &mut usize, ctx: CommonCtx) -> Result<usize, scroll::Error> {
+    pub fn read_size(
+        src: &[u8],
+        offset: &mut usize,
+        ctx: CommonCtx,
+    ) -> Result<usize, scroll::Error> {
         let size = match ctx.lua_version.into_tuple() {
             (5, 1) => src.gread_with::<i32>(offset, ctx.endianness)? as usize,
             (5, 2) => src.gread_with::<i32>(offset, ctx.endianness)? as usize,
-            (5, 3) => src.gread_with::<i32>(offset, ctx.endianness)? as usize, 
+            (5, 3) => src.gread_with::<i32>(offset, ctx.endianness)? as usize,
             (5, 4) => Uleb128::read(src, offset)? as usize,
-            _ => return Err(scroll::Error::Custom("Unsupported Lua version".into()))
+            _ => return Err(scroll::Error::Custom("Unsupported Lua version".into())),
         };
 
         Ok(size)
     }
 
-    pub fn write_size(&self, dst: &mut [u8], offset: &mut usize, ctx: CommonCtx) -> Result<usize, scroll::Error> {
+    pub fn write_size(
+        &self,
+        dst: &mut [u8],
+        offset: &mut usize,
+        ctx: CommonCtx,
+    ) -> Result<usize, scroll::Error> {
         let bytes_written = match ctx.lua_version.into_tuple() {
             (5, 1) => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?,
             (5, 2) => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?,
-            (5, 3) => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?, 
+            (5, 3) => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?,
             // (5, 4) => Uleb128::read(src, offset)? as u64, // No writing support for Uleb128 in scroll
-            _ => return Err(scroll::Error::Custom("Unsupported Lua version".into()))
+            _ => return Err(scroll::Error::Custom("Unsupported Lua version".into())),
         };
 
         Ok(bytes_written)
@@ -85,13 +94,7 @@ where
         let size = Array::<T>::read_size(src, offset, ctx)?; // Is the generic really needed?
         let data: Vec<T> = try_gread_vec_with!(src, offset, size, ctx);
 
-        Ok((
-            Array {
-                size,
-                data,
-            },
-            *offset,
-        ))
+        Ok((Array { size, data }, *offset))
     }
 }
 

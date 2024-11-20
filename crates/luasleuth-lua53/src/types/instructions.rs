@@ -231,7 +231,7 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Instruction {
     }
 }
 
-impl<'a> ctx::TryIntoCtx<CommonCtx> for Instruction {
+impl ctx::TryIntoCtx<CommonCtx> for Instruction {
     type Error = scroll::Error;
 
     fn try_into_ctx(self, src: &mut [u8], ctx: CommonCtx) -> Result<usize, Self::Error> {
