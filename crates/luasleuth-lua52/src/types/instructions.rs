@@ -1,4 +1,4 @@
-use luasleuth_common::{mask, CommonCtx};
+use luasleuth_common::{mask, types::Packable, CommonCtx};
 use scroll::{ctx, Pread, Pwrite};
 
 pub mod constants {
@@ -132,13 +132,13 @@ impl From<u8> for Opcode {
     }
 }
 
-impl Instruction {
-    pub fn decode(inst: u32) -> Instruction {
+impl Packable for Instruction {
+    fn decode(raw: u32) -> Instruction {
         use constants::*;
         use Opcode::*;
 
-        let opcode: Opcode = ((inst & 0x3F) as u8).into();
-        let a = ((inst >> 6) & 0xFF) as u8;
+        let opcode: Opcode = ((raw & 0x3F) as u8).into();
+        let a = ((raw >> 6) & 0xFF) as u8;
 
         match opcode {
             OP_MOVE | OP_LOADBOOL | OP_LOADNIL | OP_GETUPVAL | OP_GETTABLE | OP_SETUPVAL
@@ -146,32 +146,32 @@ impl Instruction {
             | OP_POW | OP_UNM | OP_NOT | OP_LEN | OP_CONCAT | OP_EQ | OP_LT | OP_LE | OP_TEST
             | OP_TESTSET | OP_CALL | OP_TAILCALL | OP_RETURN | OP_SETLIST | OP_LOADKX
             | OP_VARARG | OP_GETTABUP | OP_SETTABUP | OP_TFORCALL => {
-                let b = ((inst >> POS_B) & mask!(SIZE_B, 0)) as u16;
-                let c = ((inst >> POS_C) & mask!(SIZE_C, 0)) as u16;
+                let b = ((raw >> POS_B) & mask!(SIZE_B, 0)) as u16;
+                let c = ((raw >> POS_C) & mask!(SIZE_C, 0)) as u16;
 
                 Instruction::iABC(opcode, a, b, c)
             }
             OP_LOADK | OP_CLOSURE => {
-                let bx = (inst >> POS_BX) & MAXARG_BX;
+                let bx = (raw >> POS_BX) & MAXARG_BX;
                 Instruction::iABx(opcode, a, bx)
             }
             OP_JMP | OP_FORLOOP | OP_FORPREP | OP_TFORLOOP => {
-                let sbx = (((inst >> POS_BX) & MAXARG_BX) as i32) - (MAXARG_SBX as i32);
+                let sbx = (((raw >> POS_BX) & MAXARG_BX) as i32) - (MAXARG_SBX as i32);
 
                 Instruction::iAsBx(opcode, a, sbx)
             }
             OP_EXTRAARG => {
-                let ax = inst >> POS_AX;
+                let ax = raw >> POS_AX;
 
                 Instruction::iAx(opcode, ax)
             }
         }
     }
 
-    pub fn encode(instruction: Instruction) -> u32 {
+    fn encode(inst: Instruction) -> u32 {
         use constants::*;
 
-        match instruction {
+        match inst {
             Instruction::iABC(op, a, b, c) => {
                 let op = op as u32;
                 let a = (a as u32) << POS_A;
