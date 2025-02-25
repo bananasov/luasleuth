@@ -1,8 +1,10 @@
 mod array;
 mod string;
+mod unsigned;
 
 pub use array::Array;
 pub use string::LuaString;
+pub use unsigned::*;
 
 /// Helper trait for implementing instruction encoding/decoding.
 pub trait Packable {
