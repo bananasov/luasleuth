@@ -6,7 +6,14 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.5.31", features = ["derive"] }
 luasleuth-common.workspace = true
-luasleuth-lua51.workspace = true
-luasleuth-lua52.workspace = true
-luasleuth-lua53.workspace = true
-luasleuth-lua54.workspace = true
+luasleuth-lua51 = { workspace = true, optional = true }
+luasleuth-lua52 = { workspace = true, optional = true }
+luasleuth-lua53 = { workspace = true, optional = true }
+luasleuth-lua54 = { workspace = true, optional = true }
+
+[features]
+default = ["lua51", "lua52", "lua53", "lua54"]
+lua51 = ["dep:luasleuth-lua51"]
+lua52 = ["dep:luasleuth-lua52"]
+lua53 = ["dep:luasleuth-lua53"]
+lua54 = ["dep:luasleuth-lua54"]
