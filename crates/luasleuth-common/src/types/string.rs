@@ -1,4 +1,4 @@
-use crate::CommonCtx;
+use crate::{types::LuaUnsigned, CommonCtx};
 use scroll::{
     ctx::{self, StrCtx},
     Pread, Pwrite,
@@ -51,13 +51,11 @@ impl<'a> LuaString<'a> {
         offset: &mut usize,
         _ctx: CommonCtx,
     ) -> Result<Self, scroll::Error> {
-        use scroll::Sleb128;
-
-        let size = Sleb128::read(src, offset)?;
-        let data: &str = src.gread_with(offset, StrCtx::Length(size as usize))?;
+        let size: LuaUnsigned = src.gread_with(offset, _ctx.endianness)?;
+        let data: &str = src.gread_with(offset, StrCtx::Length(size.value - 1))?;
 
         Ok(LuaString {
-            size: size as usize,
+            size: size.value,
             data,
         })
     }
@@ -132,5 +130,11 @@ impl ctx::TryIntoCtx<CommonCtx> for LuaString<'_> {
             (5, 4) => self.write_lua54_string(dst, offset, ctx),
             _ => unimplemented!(),
         }
+    }
+}
+
+impl std::fmt::Display for LuaString<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.data)
     }
 }
