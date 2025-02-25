@@ -6,7 +6,7 @@ A versatile Lua disassembler written in Rust, supporting the most used Lua 5.x v
 
 ## Features
 
-- Support for all most 5.x versions (5.1 - 5.4)
+- Support for most 5.x versions (5.1 - 5.4)
 - Cross-platform compatibility
 - Written in Rust for fun and masochism
 
