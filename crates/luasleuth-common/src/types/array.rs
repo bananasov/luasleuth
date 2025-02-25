@@ -22,7 +22,6 @@ impl<T> Array<T> {
             (5, 4) => src.gread_with::<LuaUnsigned>(offset, ctx.endianness)?.value,
             _ => return Err(scroll::Error::Custom("Unsupported Lua version".into())),
         };
-        println!("Array size: {size}");
 
         Ok(size)
     }
