@@ -49,9 +49,9 @@ impl<'a> LuaString<'a> {
     pub fn read_lua54_string(
         src: &'a [u8],
         offset: &mut usize,
-        _ctx: CommonCtx,
+        ctx: CommonCtx,
     ) -> Result<Self, scroll::Error> {
-        let size: LuaUnsigned = src.gread_with(offset, _ctx.endianness)?;
+        let size: LuaUnsigned = src.gread_with(offset, ctx.endianness)?;
         let data: &str = src.gread_with(offset, StrCtx::Length(size.value - 1))?;
 
         Ok(LuaString {

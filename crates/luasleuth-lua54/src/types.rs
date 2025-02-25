@@ -4,7 +4,7 @@ pub mod instructions;
 pub mod upvalues;
 
 use luasleuth_common::{
-    types::{Array, LuaString, LuaUnsigned},
+    types::{Array, Bytecode as BytecodeTrait, LuaString, LuaUnsigned},
     CommonCtx, Version,
 };
 use scroll::{ctx, Pread};
@@ -81,3 +81,5 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {
         ))
     }
 }
+
+impl BytecodeTrait for Bytecode<'_> {}

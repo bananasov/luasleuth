@@ -2,7 +2,7 @@ pub mod constants;
 pub mod debug_info;
 pub mod instructions;
 
-use luasleuth_common::types::{Array, LuaString};
+use luasleuth_common::types::{Array, Bytecode as BytecodeTrait, LuaString};
 use luasleuth_common::{CommonCtx, Version};
 use scroll::{ctx, Pread};
 
@@ -79,3 +79,5 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {
         ))
     }
 }
+
+impl BytecodeTrait for Bytecode<'_> {}
