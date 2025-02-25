@@ -154,7 +154,6 @@ impl Packable for Instruction {
 
         let opcode: Opcode = ((raw & mask!(SIZE_OP, 0)) as u8).into();
         let a = ((raw >> POS_A) & mask!(SIZE_A, 0)) as u8;
-        println!("{:?}", opcode);
 
         match opcode {
             // iABC

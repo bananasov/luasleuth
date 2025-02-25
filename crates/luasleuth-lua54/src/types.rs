@@ -51,24 +51,17 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {
         let offset = &mut 0;
 
         let source: LuaString = src.gread_with(offset, ctx)?;
-        println!("name: {source}, {}", source.size);
         let line_defined: LuaUnsigned = src.gread_with(offset, ctx.endianness)?;
         let last_line_defined: LuaUnsigned = src.gread_with(offset, ctx.endianness)?;
         let number_of_parameters: u8 = src.gread_with(offset, ctx.endianness)?;
         let is_vararg: u8 = src.gread_with(offset, ctx.endianness)?;
         let max_stack_size: u8 = src.gread_with(offset, ctx.endianness)?;
 
-        println!("before inst");
         let instructions: Array<instructions::Instruction> = src.gread_with(offset, ctx)?;
-        println!("after inst");
         let constants: Array<constants::Constant> = src.gread_with(offset, ctx)?;
-        println!("after constants");
         let upvalues: Array<upvalues::Upvalue> = src.gread_with(offset, ctx)?;
-        println!("after upvalues");
         let prototypes: Array<Prototype> = src.gread_with(offset, ctx)?;
-        println!("after prototypes");
         let debug_info: debug_info::DebugInfo = src.gread_with(offset, ctx)?;
-        println!("after debug info");
 
         Ok((
             Self {
