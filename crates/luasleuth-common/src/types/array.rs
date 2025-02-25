@@ -1,5 +1,7 @@
 use crate::{try_gread_vec_with, try_gwrite_vec_with, CommonCtx};
-use scroll::{ctx, Pread, Pwrite, Uleb128};
+use scroll::{ctx, Pread, Pwrite};
+
+use super::LuaUnsigned;
 
 #[derive(Debug)]
 pub struct Array<T> {
@@ -17,9 +19,10 @@ impl<T> Array<T> {
             (5, 1) => src.gread_with::<i32>(offset, ctx.endianness)? as usize,
             (5, 2) => src.gread_with::<i32>(offset, ctx.endianness)? as usize,
             (5, 3) => src.gread_with::<i32>(offset, ctx.endianness)? as usize,
-            (5, 4) => Uleb128::read(src, offset)? as usize,
+            (5, 4) => src.gread_with::<LuaUnsigned>(offset, ctx.endianness)?.value,
             _ => return Err(scroll::Error::Custom("Unsupported Lua version".into())),
         };
+        println!("Array size: {size}");
 
         Ok(size)
     }
@@ -34,7 +37,10 @@ impl<T> Array<T> {
             (5, 1) => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?,
             (5, 2) => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?,
             (5, 3) => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?,
-            // (5, 4) => Uleb128::read(src, offset)? as u64, // No writing support for Uleb128 in scroll
+            (5, 4) => {
+                let size = LuaUnsigned::new(self.size);
+                dst.gwrite_with(size, offset, ctx.endianness)?
+            }
             _ => return Err(scroll::Error::Custom("Unsupported Lua version".into())),
         };
 
@@ -70,7 +76,33 @@ impl ctx::TryFromCtx<'_, CommonCtx> for Array<i32> {
     }
 }
 
+impl ctx::TryFromCtx<'_, CommonCtx> for Array<u8> {
+    type Error = scroll::Error;
+
+    fn try_from_ctx(src: &'_ [u8], ctx: CommonCtx) -> Result<(Self, usize), Self::Error> {
+        let offset = &mut 0;
+
+        let size = Array::<u8>::read_size(src, offset, ctx)?; // Is the generic really needed?
+        let data: Vec<u8> = try_gread_vec_with!(src, offset, size, ctx.endianness);
+
+        Ok((Self { size, data }, *offset))
+    }
+}
+
 impl ctx::TryIntoCtx<CommonCtx> for Array<i32> {
+    type Error = scroll::Error;
+
+    fn try_into_ctx(self, dst: &mut [u8], ctx: CommonCtx) -> Result<usize, Self::Error> {
+        let offset = &mut 0;
+
+        Self::write_size(&self, dst, offset, ctx)?;
+        try_gwrite_vec_with!(dst, offset, self.data, ctx.endianness);
+
+        Ok(*offset)
+    }
+}
+
+impl ctx::TryIntoCtx<CommonCtx> for Array<u8> {
     type Error = scroll::Error;
 
     fn try_into_ctx(self, dst: &mut [u8], ctx: CommonCtx) -> Result<usize, Self::Error> {
