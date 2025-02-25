@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.21", features = ["derive"] }
+clap = { version = "4.5.31", features = ["derive"] }
 luasleuth-common.workspace = true
 luasleuth-lua51.workspace = true
 luasleuth-lua52.workspace = true
 luasleuth-lua53.workspace = true
+luasleuth-lua54.workspace = true
