@@ -22,7 +22,9 @@ impl<'a> LuaString<'a> {
             8 => src.gread_with::<i64>(offset, ctx.endianness)? as usize,
             _ => unimplemented!(),
         };
-        let data: &str = src.gread_with(offset, StrCtx::Length(size - 1))?;
+        let size = size - 1; // Remove the null byte
+
+        let data: &str = src.gread_with(offset, StrCtx::Length(size))?;
         *offset += 1; // null terminator
 
         Ok(LuaString { size, data })
@@ -68,8 +70,8 @@ impl<'a> LuaString<'a> {
         ctx: CommonCtx,
     ) -> Result<usize, scroll::Error> {
         match ctx.size_of_size_t {
-            4 => dst.gwrite_with(self.size as i32, offset, ctx.endianness)?,
-            8 => dst.gwrite_with(self.size as i64, offset, ctx.endianness)?,
+            4 => dst.gwrite_with(self.size as i32 + 1, offset, ctx.endianness)?,
+            8 => dst.gwrite_with(self.size as i64 + 1, offset, ctx.endianness)?,
             _ => unimplemented!(),
         };
 
