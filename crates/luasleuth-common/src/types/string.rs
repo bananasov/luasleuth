@@ -44,9 +44,13 @@ impl<'a> LuaString<'a> {
         if size == 0xFF {
             return Self::read_lua51_string(src, offset, ctx);
         }
-        let size = size - 1;
+
+        if size == 0 {
+            return Ok(LuaString { size: 0, data: "" });
+        }
 
         // I dont know why we're doing size - 1, but if i dont it fucks up.
+        let size = size - 1;
         let data: &str = src.gread_with(offset, StrCtx::Length(size))?;
 
         Ok(LuaString { size, data })
@@ -59,8 +63,11 @@ impl<'a> LuaString<'a> {
         ctx: CommonCtx,
     ) -> Result<Self, scroll::Error> {
         let size: LuaUnsigned = src.gread_with(offset, ctx.endianness)?;
-        let size = size.value - 1;
+        if size.value == 0 {
+            return Ok(LuaString { size: 0, data: "" });
+        }
 
+        let size = size.value - 1;
         let data: &str = src.gread_with(offset, StrCtx::Length(size))?;
 
         Ok(LuaString { size, data })
