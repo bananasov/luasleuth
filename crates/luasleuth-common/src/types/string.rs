@@ -22,8 +22,12 @@ impl<'a> LuaString<'a> {
             8 => src.gread_with::<i64>(offset, ctx.endianness)? as usize,
             _ => unimplemented!(),
         };
-        let size = size - 1; // Remove the null byte
 
+        if size == 0 {
+            return Ok(LuaString { size: 0, data: "" });
+        }
+
+        let size = size - 1; // Remove the null byte
         let data: &str = src.gread_with(offset, StrCtx::Length(size))?;
         *offset += 1; // null terminator
 
