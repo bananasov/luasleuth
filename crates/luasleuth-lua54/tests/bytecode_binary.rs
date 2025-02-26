@@ -1,4 +1,4 @@
-use luasleuth_common::{disassembler::Disassemble as _, types::LuaUnsigned};
+use luasleuth_common::disassembler::Disassemble as _;
 use luasleuth_lua54::disassembler::Disassembler;
 
 #[test]
