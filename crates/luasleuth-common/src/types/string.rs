@@ -40,9 +40,10 @@ impl<'a> LuaString<'a> {
         if size == 0xFF {
             return Self::read_lua51_string(src, offset, ctx);
         }
+        let size = size - 1;
 
         // I dont know why we're doing size - 1, but if i dont it fucks up.
-        let data: &str = src.gread_with(offset, StrCtx::Length(size - 1))?;
+        let data: &str = src.gread_with(offset, StrCtx::Length(size))?;
 
         Ok(LuaString { size, data })
     }
