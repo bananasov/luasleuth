@@ -150,6 +150,12 @@ impl PartialEq for LuaString<'_> {
     }
 }
 
+impl PartialEq<&str> for LuaString<'_> {
+    fn eq(&self, other: &&str) -> bool {
+        self.data == *other && self.size == other.len()
+    }
+}
+
 impl Eq for LuaString<'_> {}
 
 impl std::fmt::Display for LuaString<'_> {
