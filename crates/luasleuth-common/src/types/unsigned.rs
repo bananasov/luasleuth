@@ -88,3 +88,17 @@ impl std::fmt::Display for LuaUnsigned {
         std::fmt::Display::fmt(&self.value, f)
     }
 }
+
+impl PartialEq for LuaUnsigned {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value
+    }
+}
+
+impl PartialEq<usize> for LuaUnsigned {
+    fn eq(&self, other: &usize) -> bool {
+        self.value == *other
+    }
+}
+
+impl Eq for LuaUnsigned {}
