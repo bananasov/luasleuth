@@ -34,6 +34,10 @@ pub struct CommonCtx {
 }
 
 impl Version {
+    pub fn new(major: u8, minor: u8) -> Self {
+        Self { major, minor }
+    }
+
     /// Returns the major and minor version as a tuple.
     ///
     /// Used for easily matching version numbers.

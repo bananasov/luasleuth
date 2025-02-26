@@ -133,6 +133,23 @@ impl ctx::TryIntoCtx<CommonCtx> for LuaString<'_> {
     }
 }
 
+impl<'a> From<&'a str> for LuaString<'a> {
+    fn from(value: &'a str) -> Self {
+        Self {
+            size: value.len(),
+            data: value,
+        }
+    }
+}
+
+impl PartialEq for LuaString<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.data == other.data && self.size == other.size
+    }
+}
+
+impl Eq for LuaString<'_> {}
+
 impl std::fmt::Display for LuaString<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.data)
