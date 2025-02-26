@@ -30,8 +30,8 @@ impl Constant<'_> {
                 true => 17,
                 false => 1,
             },
-            Constant::Float(_) => 3,
-            Constant::Integer(_) => 19,
+            Constant::Float(_) => 19,
+            Constant::Integer(_) => 3,
             Constant::String(string) => {
                 if string.size >= LUAI_MAXSHORTLEN {
                     20
