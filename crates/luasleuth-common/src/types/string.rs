@@ -54,12 +54,11 @@ impl<'a> LuaString<'a> {
         ctx: CommonCtx,
     ) -> Result<Self, scroll::Error> {
         let size: LuaUnsigned = src.gread_with(offset, ctx.endianness)?;
-        let data: &str = src.gread_with(offset, StrCtx::Length(size.value - 1))?;
+        let size = size.value - 1;
 
-        Ok(LuaString {
-            size: size.value,
-            data,
-        })
+        let data: &str = src.gread_with(offset, StrCtx::Length(size))?;
+
+        Ok(LuaString { size, data })
     }
 
     /// Write a Lua 5.1/5.2 string.
