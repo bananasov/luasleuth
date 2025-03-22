@@ -29,7 +29,7 @@ pub enum Instruction {
     iAsBx(Opcode, u8, i32),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 #[repr(u8)]
 pub enum Opcode {
