@@ -4,6 +4,7 @@ use scroll::{
     Pread, Pwrite,
 };
 
+/// An official Lua string
 #[derive(Debug)]
 pub struct LuaString<'a> {
     pub size: usize,
