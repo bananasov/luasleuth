@@ -1,4 +1,5 @@
 mod array;
+pub mod leb128;
 mod string;
 mod unsigned;
 
