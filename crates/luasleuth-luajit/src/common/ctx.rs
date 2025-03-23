@@ -17,6 +17,6 @@ impl BytecodeContext {
     /// Determine if the bytecode is stripped of debug information
     #[inline]
     pub fn is_stripped(&self) -> bool {
-        self.flags & BYTECODE_IS_STRIPPED == 0
+        (self.flags & BYTECODE_IS_STRIPPED) != 0
     }
 }

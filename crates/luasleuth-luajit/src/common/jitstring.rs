@@ -31,14 +31,11 @@ impl<'a> JitString<'a> {
     }
 }
 
-impl<'a> ctx::TryFromCtx<'a, bool> for JitString<'a> {
+impl<'a> ctx::TryFromCtx<'a, ()> for JitString<'a> {
     type Error = scroll::Error;
 
-    fn try_from_ctx(src: &'a [u8], debug_mode: bool) -> Result<(Self, usize), Self::Error> {
+    fn try_from_ctx(src: &'a [u8], _: ()) -> Result<(Self, usize), Self::Error> {
         let offset = &mut 0;
-        if debug_mode {
-            return Ok((JitString::empty(), *offset));
-        }
 
         let type_and_len: Uleb128 = src.gread_with(offset, ())?;
         let type_and_len: u64 = type_and_len.into();
@@ -88,7 +85,7 @@ mod tests {
 
         let offset = &mut 0;
         let string: JitString = data
-            .gread_with(offset, false)
+            .gread_with(offset, ())
             .expect("Failed to read JitString from data");
         assert_eq!(string, JitString::new("Hello, World!"));
     }

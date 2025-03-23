@@ -1,7 +1,10 @@
 pub mod debug_info;
 pub mod instructions;
 
-use luasleuth_common::types::leb128::Uleb128;
+use luasleuth_common::{
+    try_gread_vec_with,
+    types::{leb128::Uleb128, Bytecode as BytecodeTrait},
+};
 use scroll::{ctx, Endian, Pread};
 
 use crate::common::{ctx::BytecodeContext, jitstring::JitString};
@@ -11,9 +14,7 @@ pub struct Header<'a> {
     pub signature: [u8; 3],
     pub version: u8,
     pub flags: Uleb128,
-
-    // this will be empty if the bytecode is stripped
-    pub chunk_name: JitString<'a>,
+    pub chunk_name: Option<JitString<'a>>,
 }
 
 #[derive(Debug)]
@@ -29,9 +30,14 @@ pub struct Prototype {
 
     /// Fixed frame size
     pub frame_size: u8,
-    // pub upvalue_count: Uleb128,
-    // pub gc_constant_count: Uleb128,
-    // pub numeric_constant_count: Uleb128,
+
+    pub upvalue_count: u8,
+    pub gc_constant_count: Uleb128,
+    pub num_constant_count: Uleb128,
+    pub instruction_count: Uleb128,
+
+    pub debug_metadata: Option<debug_info::DebugInfoMetadata>,
+    pub instructions: Vec<instructions::Instruction>,
 }
 
 #[derive(Debug)]
@@ -55,7 +61,11 @@ impl<'a> ctx::TryFromCtx<'a, Endian> for Header<'a> {
             endian: ctx,
         };
 
-        let chunk_name: JitString = src.gread_with(offset, context.is_stripped())?;
+        let chunk_name: Option<JitString> = if !context.is_stripped() {
+            Some(src.gread_with(offset, ())?)
+        } else {
+            None
+        };
 
         Ok((
             Self {
@@ -82,9 +92,44 @@ impl<'a> ctx::TryFromCtx<'a, BytecodeContext> for Prototype {
 
         let upvalue_count: u8 = src.gread_with(offset, ctx.endian)?;
         let gc_constant_count: Uleb128 = src.gread_with(offset, ())?;
-        let numeric_constant_count: Uleb128 = src.gread_with(offset, ())?;
-        let bytecode_instruction_count: Uleb128 = src.gread_with(offset, ())?;
+        let num_constant_count: Uleb128 = src.gread_with(offset, ())?;
 
-        todo!()
+        let instruction_count: Uleb128 = src.gread_with(offset, ())?;
+        let instruction_count: usize = instruction_count.into();
+
+        let debug_metadata: Option<debug_info::DebugInfoMetadata> = if !ctx.is_stripped() {
+            Some(src.gread_with(offset, ctx)?)
+        } else {
+            None
+        };
+
+        let instructions: Vec<instructions::Instruction> =
+            try_gread_vec_with!(src, offset, instruction_count, ctx);
+
+        Ok((
+            Self {
+                prototype_length,
+                flags,
+                parameter_count,
+                frame_size,
+                upvalue_count,
+                gc_constant_count,
+                num_constant_count,
+                instruction_count: instruction_count.into(),
+                debug_metadata,
+                instructions,
+            },
+            *offset,
+        ))
+    }
+}
+
+impl BytecodeTrait for Bytecode<'_> {
+    fn identifier() -> &'static str {
+        "luajit-v2"
+    }
+
+    fn display_name() -> &'static str {
+        "LuaJIT v2"
     }
 }

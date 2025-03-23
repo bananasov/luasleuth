@@ -9,6 +9,7 @@ use luasleuth_lua51::disassembler::Disassembler as Lua51Disassembler;
 use luasleuth_lua52::disassembler::Disassembler as Lua52Disassembler;
 use luasleuth_lua53::disassembler::Disassembler as Lua53Disassembler;
 use luasleuth_lua54::disassembler::Disassembler as Lua54Disassembler;
+use luasleuth_luajit::v2::disassembler::Disassembler as LuajitV2Disassembler;
 
 #[derive(Debug, Parser)]
 struct Cli {
@@ -62,6 +63,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 file.read_to_end(&mut buffer)?;
 
                 let bytecode = Lua54Disassembler::new(&buffer).disassemble()?;
+                println!("{:#?}", bytecode);
+            }
+            types::LuaVersion::Luajitv2 => {
+                let mut file = File::open(path)?;
+                let mut buffer = Vec::new();
+                file.read_to_end(&mut buffer)?;
+
+                let bytecode = LuajitV2Disassembler::new(&buffer).disassemble()?;
                 println!("{:#?}", bytecode);
             }
             _ => todo!(),

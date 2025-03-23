@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [ 
+members = [
     "crates/luasleuth",
     "crates/luasleuth-common",
     "crates/luasleuth-lua51",
@@ -17,3 +17,4 @@ luasleuth-lua51 = { path = "./crates/luasleuth-lua51" }
 luasleuth-lua52 = { path = "./crates/luasleuth-lua52" }
 luasleuth-lua53 = { path = "./crates/luasleuth-lua53" }
 luasleuth-lua54 = { path = "./crates/luasleuth-lua54" }
+luasleuth-luajit = { path = "./crates/luasleuth-luajit" }

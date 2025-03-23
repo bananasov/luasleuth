@@ -120,6 +120,7 @@ dependencies = [
  "luasleuth-lua52",
  "luasleuth-lua53",
  "luasleuth-lua54",
+ "luasleuth-luajit",
 ]
 
 [[package]]
