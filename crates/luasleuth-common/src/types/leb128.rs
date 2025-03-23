@@ -54,6 +54,21 @@ impl From<u64> for Uleb128 {
     }
 }
 
+impl From<Uleb128> for usize {
+    fn from(value: Uleb128) -> Self {
+        value.value as usize
+    }
+}
+
+impl From<usize> for Uleb128 {
+    fn from(value: usize) -> Self {
+        Self {
+            value: value as u64,
+            count: 0,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 /// An signed leb128 integer
 pub struct Sleb128 {
