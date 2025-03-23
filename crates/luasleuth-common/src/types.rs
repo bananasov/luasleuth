@@ -18,4 +18,10 @@ pub trait Packable {
 /// Trait for bytecode instructions.
 ///
 /// This trait is used as a trait bound on the disassembler trait to ensure T is a valid bytecode struct.
-pub trait Bytecode {}
+pub trait Bytecode {
+    /// The unique ID for this bytecode variant
+    fn identifier() -> &'static str;
+
+    /// Returns the human-readable display name for the bytecode variant
+    fn display_name() -> &'static str;
+}

@@ -79,4 +79,12 @@ impl<'a> ctx::TryFromCtx<'a, CommonCtx> for Prototype<'a> {
     }
 }
 
-impl BytecodeTrait for Bytecode<'_> {}
+impl BytecodeTrait for Bytecode<'_> {
+    fn identifier() -> &'static str {
+        "lua52"
+    }
+
+    fn display_name() -> &'static str {
+        "Lua 5.2"
+    }
+}
