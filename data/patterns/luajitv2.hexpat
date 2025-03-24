@@ -20,7 +20,7 @@ struct Header {
 
     // Check if the bytecode is stripped
     // if not, add the chunk name
-    if (flags & BCDUMP_F_STRIP == 0) {
+    if (!(flags & BCDUMP_F_STRIP != 0)) {
         type::uLEB128 chunkNameLen;
         char chunkName[chunkNameLen];
     }
